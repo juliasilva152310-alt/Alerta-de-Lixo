@@ -1,0 +1,237 @@
+import tkinter as tk
+from tkinter import messagebox, simpledialog
+
+# Serviços disponíveis
+servicos_disponiveis = {
+    1: "E-mail",
+    2: "Faxinação de rua",
+    3: "Solicitação de recipientes de lixo",
+    4: "Loja"
+}
+
+# Produtos e materiais com preços
+produtos = {
+    1: ("Sabão em pó", 15.00),
+    2: ("Detergente", 5.00),
+    3: ("Esponja", 3.50)
+}
+
+materiais = {
+    1: ("Vassoura", 20.00),
+    2: ("Rodo", 18.00),
+    3: ("Pano de chão", 7.00)
+}
+
+carrinho = []  # lista para acumular compras
+
+# --- Tela de Login ---
+def tela_login():
+    def validar_login():
+        email = entry_email.get()
+        senha = entry_senha.get()
+
+        if not email and not senha:
+            messagebox.showerror("Erro","Precisamos de um Email e de uma Senha")
+            return
+        elif not email:
+            messagebox.showerror("Erro","Precisamos do seu email")
+            return
+        elif not senha:
+            messagebox.showerror("Erro","Precisamos de uma senha.")
+            return
+
+        if "@" not in email or ".com" not in email:
+            messagebox.showerror("Erro", "E-mail inválido (faltando @ ou .com)")
+            return
+        if len(senha) != 8:
+            messagebox.showerror("Erro", "A senha deve ter exatamente 8 caracteres.")
+            return
+
+        messagebox.showinfo("Sucesso", "Login realizado com sucesso!")
+        janela_login.withdraw() # Esconde a janela de login em vez de destruir, evitando fechar o app
+        tela_servicos()
+
+    global janela_login
+    janela_login = tk.Tk()
+    janela_login.title("Tela de Login")
+    janela_login.geometry("400x300")
+
+    tk.Label(janela_login, text="Login", font=("Arial", 16)).pack(pady=10)
+
+    tk.Label(janela_login, text="Email:").place(x=50, y=50)
+    entry_email = tk.Entry(janela_login, width=25)
+    entry_email.place(x=120, y=50)
+
+    tk.Label(janela_login, text="Senha:").place(x=50, y=90)
+    entry_senha = tk.Entry(janela_login, show="*", width=25)
+    entry_senha.place(x=120, y=90)
+
+    tk.Button(janela_login, text="Entrar", bg="green", fg="white", width=10, command=validar_login).place(x=165, y=140)
+
+    janela_login.mainloop()
+
+# --- Tela de Serviços ---
+def tela_servicos():
+    def escolher_servico():
+        escolha = lista_servicos.curselection()
+        if not escolha:
+            messagebox.showwarning("Aviso", "Selecione um serviço.")
+            return
+        servico = lista_servicos.get(escolha)
+
+        janela_servicos.destroy()
+        if servico == "E-mail":
+            tela_email()
+        elif servico == "Faxinação de rua":
+            tela_faxina()
+        elif servico == "Solicitação de recipientes de lixo":
+            tela_recipiente()
+        elif servico == "Loja":
+            tela_loja()
+
+    def voltar_login():
+        janela_servicos.destroy()
+        janela_login.deiconify() # Traz a tela de login de volta sem recriá-la
+
+    janela_servicos = tk.Toplevel() # Mudado de Tk() para Toplevel()
+    janela_servicos.title("Serviços Disponíveis")
+    janela_servicos.geometry("400x300")
+
+    tk.Label(janela_servicos, text="Escolha um serviço:").pack(pady=5)
+
+    lista_servicos = tk.Listbox(janela_servicos, width=35)
+    for s in servicos_disponiveis.values():
+        lista_servicos.insert(tk.END, s)
+    lista_servicos.pack(pady=5)
+
+    tk.Button(janela_servicos, text="Confirmar", bg="blue", fg="white", width=15, command=escolher_servico).pack(pady=2)
+    tk.Button(janela_servicos, text="Voltar", bg="red", fg="white", width=15, command=voltar_login).pack(pady=2)
+
+# --- Tela de E-mail ---
+def tela_email():
+    def enviar_email():
+        nome = entry_nome.get().strip()
+        if not nome:
+            messagebox.showerror("Erro", "Por favor digite o seu nome")
+            return
+
+        mensagem = entry_msg.get("1.0", tk.END).strip()
+        if not mensagem:
+            messagebox.showerror("Erro", "Por favor digite a sua mensagem")
+            return
+
+        messagebox.showinfo("Sucesso", f"A sua mensagem de {nome} foi enviada:\n{mensagem}")
+
+    janela_email = tk.Toplevel()
+    janela_email.title("Envio de E-mail")
+    janela_email.geometry("400x320")
+
+    tk.Label(janela_email, text="Nome:").pack(pady=2)
+    entry_nome = tk.Entry(janela_email, width=30)
+    entry_nome.pack(pady=2)
+
+    tk.Label(janela_email, text="Mensagem:").pack(pady=2)
+    entry_msg = tk.Text(janela_email, height=5, width=40)
+    entry_msg.pack(pady=2)
+
+    tk.Button(janela_email, text="Enviar", bg="green", fg="white", width=15, command=enviar_email).pack(pady=5)
+    tk.Button(janela_email, text="Voltar", bg="red", fg="white", width=15, command=lambda: [janela_email.destroy(), tela_servicos()]).pack()
+
+# --- Tela de Faxinação ---
+def tela_faxina():
+    def solicitar_faxina():
+        endereco = entry_endereco.get().strip()
+        if not endereco:
+            messagebox.showerror("Erro", "O endereço não pode estar vazio.")
+            return
+        messagebox.showinfo("Sucesso", f"O faxineiro foi solicitado para o endereço: {endereco}")
+
+    janela_faxina = tk.Toplevel()
+    janela_faxina.title("Solicitação de Faxinação")
+    janela_faxina.geometry("350x200")
+
+    tk.Label(janela_faxina, text="Endereço:").pack(pady=10)
+    entry_endereco = tk.Entry(janela_faxina, width=40)
+    entry_endereco.pack(pady=5)
+
+    tk.Button(janela_faxina, text="Solicitar", bg="blue", fg="white", width=15, command=solicitar_faxina).pack(pady=5)
+    tk.Button(janela_faxina, text="Voltar", bg="red", fg="white", width=15, command=lambda: [janela_faxina.destroy(), tela_servicos()]).pack()
+
+# --- Tela de Recipientes ---
+def tela_recipiente():
+    def solicitar_recipiente():
+        escolha = lista_tipos.curselection()
+        if not escolha: # Validação para não quebrar se nada for selecionado
+            messagebox.showwarning("Aviso", "Selecione um tipo de recipiente.")
+            return
+
+        tipo = lista_tipos.get(escolha)
+        endereco = entry_endereco.get().strip()
+        if not endereco:
+            messagebox.showerror("Erro", "O endereço não pode estar vazio.")
+            return
+        messagebox.showinfo("Sucesso", f"Solicitação de {tipo} para o endereço: {endereco}")
+
+    janela_recipiente = tk.Toplevel()
+    janela_recipiente.title("Solicitação de Recipientes")
+    janela_recipiente.geometry("350x350")
+
+    tk.Label(janela_recipiente, text="Tipos de Recipiente:").pack(pady=5)
+    lista_tipos = tk.Listbox(janela_recipiente, width=30, height=5)
+    tipos = ["Caçambas", "Lata reciclável", "Container grande", "Lixeira comum"]
+    for t in tipos:
+        lista_tipos.insert(tk.END, t)
+    lista_tipos.pack(pady=5)
+
+    tk.Label(janela_recipiente, text="Endereço de entrega:").pack(pady=5)
+    entry_endereco = tk.Entry(janela_recipiente, width=40)
+    entry_endereco.pack(pady=5)
+
+    tk.Button(janela_recipiente, text="Solicitar", bg="blue", fg="white", width=15, command=solicitar_recipiente).pack(pady=2)
+    tk.Button(janela_recipiente, text="Voltar", bg="red", fg="white", width=15, command=lambda: [janela_recipiente.destroy(), tela_servicos()]).pack()
+
+# --- Tela da Loja ---
+def tela_loja():
+    def adicionar_item(itens, num):
+        qtd = simpledialog.askinteger("Quantidade", "Digite a quantidade desejada:", minvalue=1)
+        if qtd: # Verifica se digitou e é maior que 0
+            nome, preco = itens[num]
+            total = qtd * preco
+            carrinho.append((nome, qtd, total))
+            messagebox.showinfo("Carrinho", f"{qtd}x {nome} adicionado.\nSubtotal: R$ {total:.2f}")
+
+    def abrir_secao(itens):
+        secao = tk.Toplevel(janela_loja)
+        secao.title("Itens disponíveis")
+        secao.geometry("250x200")
+        tk.Label(secao, text="Escolha um item e quantidade:").pack(pady=10)
+        for num, (nome, preco) in itens.items():
+            tk.Button(secao, text=f"{nome} (R$ {preco:.2f})", width=25,
+                      command=lambda n=num: [adicionar_item(itens, n), secao.destroy()]).pack(pady=3)
+
+    def finalizar_compra():
+        if not carrinho:
+            messagebox.showwarning("Carrinho vazio", "Nenhum item foi adicionado.")
+            return
+        resumo = "--- \nCarrinho de \nCompras ---\n\n"
+        valor_final = 0
+        for nome, qtd, total in carrinho:
+            resumo += f"{qtd}x {nome} - R$ {total:.2f}\n"
+            valor_final += total
+        resumo += f"\nValor total: R$ {valor_final:.2f}"
+
+        messagebox.showinfo("Compra finalizada", resumo)
+        carrinho.clear() # Limpa o carrinho após finalizar a compra
+
+    janela_loja = tk.Toplevel()
+    janela_loja.title("Loja")
+    janela_loja.geometry("300x300")
+
+    tk.Label(janela_loja, text="Escolha uma seção:").pack(pady=10)
+    tk.Button(janela_loja, text="Produtos", width=20, command=lambda: abrir_secao(produtos)).pack(pady=5)
+    tk.Button(janela_loja, text="Materiais de limpeza", width=20, command=lambda: abrir_secao(materiais)).pack(pady=5)
+    tk.Button(janela_loja, text="Finalizar compra", bg="green", fg="white", width=20, command=finalizar_compra).pack(pady=5)
+    tk.Button(janela_loja, text="Voltar", bg="red", fg="white", width=20, command=lambda: [janela_loja.destroy(), tela_servicos()]).pack(pady=5)
+
+# Iniciar o sistema
+tela_login()
