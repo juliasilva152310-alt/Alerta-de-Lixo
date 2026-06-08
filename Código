@@ -93,7 +93,7 @@ def tela_servicos():
         janela_servicos.destroy()
         janela_login.deiconify() # Traz a tela de login de volta sem recriá-la
 
-    janela_servicos = tk.Toplevel() # Mudado de Tk() para Toplevel()
+    janela_servicos = tk.Tk() # Mudado de Tk() para Toplevel()
     janela_servicos.title("Serviços Disponíveis")
     janela_servicos.geometry("400x300")
 
@@ -122,7 +122,7 @@ def tela_email():
 
         messagebox.showinfo("Sucesso", f"A sua mensagem de {nome} foi enviada:\n{mensagem}")
 
-    janela_email = tk.Toplevel()
+    janela_email = tk.Tk()
     janela_email.title("Envio de E-mail")
     janela_email.geometry("400x320")
 
@@ -201,7 +201,7 @@ def tela_loja():
             messagebox.showinfo("Carrinho", f"{qtd}x {nome} adicionado.\nSubtotal: R$ {total:.2f}")
 
     def abrir_secao(itens):
-        secao = tk.Toplevel(janela_loja)
+        secao = tk.Tk(janela_loja)
         secao.title("Itens disponíveis")
         secao.geometry("250x200")
         tk.Label(secao, text="Escolha um item e quantidade:").pack(pady=10)
@@ -223,7 +223,7 @@ def tela_loja():
         messagebox.showinfo("Compra finalizada", resumo)
         carrinho.clear() # Limpa o carrinho após finalizar a compra
 
-    janela_loja = tk.Toplevel()
+    janela_loja = tk.Tk()
     janela_loja.title("Loja")
     janela_loja.geometry("300x300")
 
